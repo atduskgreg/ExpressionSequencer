@@ -3,24 +3,43 @@
 
 struct ExpSeq : Module {
 	enum ParamIds {
-		PITCH_PARAM,
+		LEVEL1_PARAM,
+		LEVEL2_PARAM,
+		LEVEL3_PARAM,
+		LEVEL4_PARAM,
+		LEVEL5_PARAM,
+		POS2_PARAM,
+		POS3_PARAM,
+		POS4_PARAM,
+		LENGTH_PARAM,
+		TEMPO_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
-		PITCH_INPUT,
+		RUN_INPUT,
+		RANDOM_INPUT,
+		RESET_INPUT,
+		CLOCK_INPUT,
+		RECORD_INPUT,
+		GATE_INPUT,
+		CV_INPUT,
 		NUM_INPUTS
 	};
 	enum OutputIds {
-		SINE_OUTPUT,
+		GATE1_OUTPUT,
+		CV1_OUTPUT,
+		GATE2_OUTPUT,
+		CV2_OUTPUT,
+		GATE3_OUTPUT,
+		CV3_OUTPUT,
+		GATE4_OUTPUT,
+		CV4_OUTPUT,
+		CLOCK_OUTPUT,
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		BLINK_LIGHT,
 		NUM_LIGHTS
 	};
-
-	float phase = 0.0;
-	float blinkPhase = 0.0;
 
 	ExpSeq() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
 	void step() override;
@@ -33,32 +52,14 @@ struct ExpSeq : Module {
 
 
 void ExpSeq::step() {
-	// Implement a simple sine oscillator
-	float deltaTime = engineGetSampleTime();
-
-	// Compute the frequency from the pitch parameter and input
-	float pitch = params[PITCH_PARAM].value;
-	pitch += inputs[PITCH_INPUT].value;
-	pitch = clamp(pitch, -4.0f, 4.0f);
-	// The default pitch is C4
-	float freq = 261.626f * powf(2.0f, pitch);
-
-	// Accumulate the phase
-	phase += freq * deltaTime;
-	if (phase >= 1.0f)
-		phase -= 1.0f;
-
-	// Compute the sine output
-	float sine = sinf(2.0f * M_PI * phase);
-	outputs[SINE_OUTPUT].value = 5.0f * sine;
-
-	// Blink light at 1Hz
-	blinkPhase += deltaTime;
-	if (blinkPhase >= 1.0f)
-		blinkPhase -= 1.0f;
-	lights[BLINK_LIGHT].value = (blinkPhase < 0.5f) ? 1.0f : 0.0f;
 }
 
+struct PlayButton : SVGSwitch, ToggleSwitch {
+	PlayButton() {
+		addFrame(SVG::load(assetGlobal("res/PlayButtonOn.svg")));
+		addFrame(SVG::load(assetGlobal("res/PlayButtonOff.svg")));
+	}
+};
 
 struct ExpSeqWidget : ModuleWidget {
 	ExpSeqWidget(ExpSeq *module) : ModuleWidget(module) {
@@ -69,13 +70,16 @@ struct ExpSeqWidget : ModuleWidget {
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(ParamWidget::create<Davies1900hBlackKnob>(Vec(28, 87), module, ExpSeq::PITCH_PARAM, -3.0, 3.0, 0.0));
+		addParam(ParamWidget::create<PlayButton>(Vec(250, 37), module, ExpSeq::PITCH_PARAM, -3.0, 3.0, 0.0));
 
-		addInput(Port::create<PJ301MPort>(Vec(33, 186), Port::INPUT, module, ExpSeq::PITCH_INPUT));
 
-		addOutput(Port::create<PJ301MPort>(Vec(33, 275), Port::OUTPUT, module, ExpSeq::SINE_OUTPUT));
+		//addParam(ParamWidget::create<Davies1900hBlackKnob>(Vec(28, 87), module, ExpSeq::PITCH_PARAM, -3.0, 3.0, 0.0));
 
-		addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(41, 59), module, ExpSeq::BLINK_LIGHT));
+		//addInput(Port::create<PJ301MPort>(Vec(33, 186), Port::INPUT, module, ExpSeq::PITCH_INPUT));
+
+		//addOutput(Port::create<PJ301MPort>(Vec(33, 275), Port::OUTPUT, module, ExpSeq::SINE_OUTPUT));
+
+		//addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(41, 59), module, ExpSeq::BLINK_LIGHT));
 	}
 };
 
