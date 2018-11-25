@@ -76,14 +76,6 @@ float ExpSeq::MAX_VAL = 1.0;
 float ExpSeq::MIN_VAL = 0.0;
 float ExpSeq::MID_VAL = (ExpSeq::MAX_VAL - ExpSeq::MID_VAL)/2;	
 
-
-void ExpSeq::step() {
-    double dTime = 1.0 / static_cast<double>(engineGetSampleRate());
-    time += dTime;
-    
-    outputs[CV1_OUTPUT].value = clamp(sequence.f(time), 0.0, 10.0);
-}
-
 struct PlayButton : SVGSwitch, ToggleSwitch {
 	PlayButton() {
 		addFrame(SVG::load(assetPlugin(plugin, "res/PlayButtonOff.svg")));
@@ -123,6 +115,70 @@ struct RecordButton : SVGSwitch, ToggleSwitch {
 	RecordButton() {
 		addFrame(SVG::load(assetPlugin(plugin, "res/RecordButtonOff.svg")));
 		addFrame(SVG::load(assetPlugin(plugin, "res/RecordButtonOn.svg")));
+	}
+};
+
+struct ExpSeqDisplay : TransparentWidget {
+	ExpSeq *module;
+
+	float getSegmentX(int segmentNum)
+	{
+		int posStartingX[] = {69, 126, 183, 239, 295}; // TODO: store X-coords somewhere global
+		ExpSeq::ParamIds posParamIds[] = {ExpSeq::ParamIds::POS2_PARAM, ExpSeq::ParamIds::POS3_PARAM, ExpSeq::ParamIds::POS4_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM};
+		float posValue = module->params[posParamIds[segmentNum]].value;
+
+		float result = box.pos.x + posStartingX[segmentNum];
+
+		if(segmentNum >= 1 && segmentNum <= 3)
+		{
+			result += 50 * (posValue - ExpSeq::MIN_VAL) / ExpSeq::MAX_VAL;
+		}
+
+		return result;
+	}
+
+	void drawSegmentEdge(NVGcontext *vg, int segmentNum)
+	{
+
+		float xPos = getSegmentX(segmentNum);
+
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, xPos, box.pos.y);
+		nvgLineTo(vg, xPos, box.pos.y + box.size.y);
+		nvgStrokeColor(vg, nvgRGBA(255,255,255,125));
+		nvgStrokeWidth(vg, 2.0);
+	    nvgStroke(vg);
+
+		ExpSeq::ParamIds levelParamIds[] = {ExpSeq::ParamIds::LEVEL1_PARAM, ExpSeq::ParamIds::LEVEL2_PARAM, ExpSeq::ParamIds::LEVEL3_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM, ExpSeq::ParamIds::LEVEL5_PARAM};
+		float lvlValue = module->params[levelParamIds[segmentNum]].value;
+
+		float lvlY = box.size.y * lvlValue / ExpSeq::MAX_LEVEL_VOLTAGE;
+		nvgBeginPath(vg);
+		nvgCircle(vg, xPos + 6.0, box.size.y - lvlY, 4.0f);
+		nvgFillColor(vg, nvgRGBA(255,255,255,255));
+		nvgFill(vg);
+	}
+
+	void drawSegmentBody(NVGcontext *vg, int startSegment, int endSegment)
+	{
+
+	}
+
+	void draw(NVGcontext *vg) override 
+	{
+		// subtle gray border
+		nvgBeginPath(vg);
+		nvgRect(vg, box.pos.x,box.pos.y, box.size.x,box.size.y);
+		nvgStrokeColor(vg, nvgRGBA(165,165,165,255));
+		nvgStroke(vg);
+		for(int i = 0; i < 5; i++){
+			if(i < 4)
+			{
+				drawSegmentBody(vg, i, i+1);
+			}
+			drawSegmentEdge(vg, i);
+		}
+		
 	}
 };
 
@@ -190,9 +246,23 @@ struct ExpSeqWidget : ModuleWidget {
 
 		addInput(Port::create<PJ301MPort>(Vec(75-11, 221-11  + 22 + 22), Port::INPUT, module, ExpSeq::InputIds::RANDOM_INPUT));
 		addInput(Port::create<PJ301MPort>(Vec(75-11, 221-11  + 22*3 + 22*3), Port::INPUT, module, ExpSeq::InputIds::CV_INPUT));
+	
+		{
+			ExpSeqDisplay *display = new ExpSeqDisplay();
+			display->module = module;
+			display->box.pos = Vec(6, 7);
+			display->box.size = Vec(367, 95);
+			addChild(display);
+		}
 	}
 };
 
+void ExpSeq::step() {
+    double dTime = 1.0 / static_cast<double>(engineGetSampleRate());
+    time += dTime;
+    
+    outputs[CV1_OUTPUT].value = clamp(sequence.f(time), 0.0, 10.0);
+}
 
 // Specify the Module and ModuleWidget subclass, human-readable
 // author name for categorization per plugin, module slug (should never
