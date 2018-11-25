@@ -93,25 +93,29 @@ struct PlayButton : SVGSwitch, ToggleSwitch {
 
 struct PlusButton : SVGSwitch, MomentarySwitch {
 	PlusButton() {
-		addFrame(SVG::load(assetPlugin(plugin, "res/PlusButton.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/PlusButtonOff.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/PlusButtonOn.svg")));
 	}
 };
 
 struct ForwardButton : SVGSwitch, MomentarySwitch {
 	ForwardButton() {
-		addFrame(SVG::load(assetPlugin(plugin, "res/ForwardButton.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/ForwardButtonOff.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/ForwardButtonOn.svg")));
 	}
 };
 
 struct BackButton : SVGSwitch, MomentarySwitch {
 	BackButton() {
-		addFrame(SVG::load(assetPlugin(plugin, "res/BackButton.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/BackButtonOff.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/BackButtonOn.svg")));
 	}
 };
 
 struct RewindButton : SVGSwitch, MomentarySwitch {
 	RewindButton() {
-		addFrame(SVG::load(assetPlugin(plugin, "res/RewindButton.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/RewindButtonOff.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/RewindButtonOn.svg")));
 	}
 };
 
