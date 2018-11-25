@@ -5,13 +5,13 @@
 class Segment {
   float m;
   float b;
-  int n;
+  float n;
 
 public:
   float f(float t) { return m * pow(t, n) + b; };
   Segment() {
     m = 1;
-    n = 1;
+    n = 1.2;
     b = 0;
   }
 };

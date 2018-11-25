@@ -81,7 +81,7 @@ void ExpSeq::step() {
     double dTime = 1.0 / static_cast<double>(engineGetSampleRate());
     time += dTime;
     
-    outputs[CV1_OUTPUT].value = sequence.f(time);
+    outputs[CV1_OUTPUT].value = clamp(sequence.f(time), 0.0, 10.0);
 }
 
 struct PlayButton : SVGSwitch, ToggleSwitch {
