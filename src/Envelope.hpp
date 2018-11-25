@@ -1,3 +1,4 @@
+#pragma once
 #include "Segment.hpp"
 #include <vector>
 

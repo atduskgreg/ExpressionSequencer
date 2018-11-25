@@ -1,5 +1,6 @@
 #include "ExpressionSequencer.hpp"
-
+#include "dsp/digital.hpp"
+#include "Sequence.hpp"
 
 struct ExpSeq : Module {
 	static float MIN_LEVEL_VOLTAGE;
@@ -56,6 +57,9 @@ struct ExpSeq : Module {
 	};
 
 	ExpSeq() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+    SchmittTrigger clockTrigger;
+    double time = 0.0;
+    Sequence sequence;
 	void step() override;
 
 	// For more advanced Module features, read Rack's engine.hpp header file
@@ -74,6 +78,10 @@ float ExpSeq::MID_VAL = (ExpSeq::MAX_VAL - ExpSeq::MID_VAL)/2;
 
 
 void ExpSeq::step() {
+    double dTime = 1.0 / static_cast<double>(engineGetSampleRate());
+    time += dTime;
+    
+    outputs[CV1_OUTPUT].value = sequence.f(time);
 }
 
 struct PlayButton : SVGSwitch, ToggleSwitch {
