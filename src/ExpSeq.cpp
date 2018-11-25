@@ -124,23 +124,30 @@ struct ExpSeqDisplay : TransparentWidget {
 	float getSegmentX(int segmentNum)
 	{
 		int posStartingX[] = {69, 126, 183, 239, 295}; // TODO: store X-coords somewhere global
-		ExpSeq::ParamIds posParamIds[] = {ExpSeq::ParamIds::POS2_PARAM, ExpSeq::ParamIds::POS3_PARAM, ExpSeq::ParamIds::POS4_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM};
-		float posValue = module->params[posParamIds[segmentNum]].value;
 
 		float result = box.pos.x + posStartingX[segmentNum];
-
 		if(segmentNum >= 1 && segmentNum <= 3)
 		{
-			result += 50 * (posValue - ExpSeq::MIN_VAL) / ExpSeq::MAX_VAL;
+			ExpSeq::ParamIds posParamIds[] = {ExpSeq::ParamIds::POS2_PARAM, ExpSeq::ParamIds::POS3_PARAM, ExpSeq::ParamIds::POS4_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM};
+			float posValue = module->params[posParamIds[segmentNum-1]].value;
+			result += -100 + 200 * (posValue - ExpSeq::MIN_VAL) / ExpSeq::MAX_VAL;
 		}
 
 		return result;
+	}
+
+	float getSegmentY(int segmentNum)
+	{
+		ExpSeq::ParamIds levelParamIds[] = {ExpSeq::ParamIds::LEVEL1_PARAM, ExpSeq::ParamIds::LEVEL2_PARAM, ExpSeq::ParamIds::LEVEL3_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM, ExpSeq::ParamIds::LEVEL5_PARAM};
+		float lvlValue = module->params[levelParamIds[segmentNum]].value;
+		return box.size.y - box.size.y * (lvlValue - ExpSeq::MIN_LEVEL_VOLTAGE) / ExpSeq::MAX_LEVEL_VOLTAGE;
 	}
 
 	void drawSegmentEdge(NVGcontext *vg, int segmentNum)
 	{
 
 		float xPos = getSegmentX(segmentNum);
+		float yPos = getSegmentY(segmentNum);
 
 		nvgBeginPath(vg);
 		nvgMoveTo(vg, xPos, box.pos.y);
@@ -148,20 +155,21 @@ struct ExpSeqDisplay : TransparentWidget {
 		nvgStrokeColor(vg, nvgRGBA(255,255,255,125));
 		nvgStrokeWidth(vg, 2.0);
 	    nvgStroke(vg);
-
-		ExpSeq::ParamIds levelParamIds[] = {ExpSeq::ParamIds::LEVEL1_PARAM, ExpSeq::ParamIds::LEVEL2_PARAM, ExpSeq::ParamIds::LEVEL3_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM, ExpSeq::ParamIds::LEVEL5_PARAM};
-		float lvlValue = module->params[levelParamIds[segmentNum]].value;
-
-		float lvlY = box.size.y * lvlValue / ExpSeq::MAX_LEVEL_VOLTAGE;
+		
 		nvgBeginPath(vg);
-		nvgCircle(vg, xPos + 6.0, box.size.y - lvlY, 4.0f);
+		nvgCircle(vg, xPos, yPos, 4.0f);
 		nvgFillColor(vg, nvgRGBA(255,255,255,255));
 		nvgFill(vg);
 	}
 
 	void drawSegmentBody(NVGcontext *vg, int startSegment, int endSegment)
 	{
-
+		nvgBeginPath(vg);
+		nvgMoveTo(vg, getSegmentX(startSegment), getSegmentY(startSegment));
+		nvgLineTo(vg, getSegmentX(endSegment), getSegmentY(endSegment));
+		nvgStrokeWidth(vg, 3.0);
+		nvgStrokeColor(vg, nvgRGBA(0, 255,0, 255));
+		nvgStroke(vg);
 	}
 
 	void draw(NVGcontext *vg) override 
