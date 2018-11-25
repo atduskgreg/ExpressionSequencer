@@ -1,13 +1,19 @@
 
-# VCV Template plugin
+# Expression Sequencer
 
-The VCV Template plugin is a starting point for developing your own plugins for VCV Rack.
-It implements a simple sine VCO, demonstrating inputs, outputs, parameters, and other concepts.
+Sequence:
 
-See https://vcvrack.com/manual/PluginDevelopmentTutorial.html for a development tutorial.
+* List of Envelopes
+* Step length
 
-## Contributing
+Envelope:
+* OnStep int
+* OffStep int
+* IsQuantized bool
+* List of Segments
 
-I welcome Issues and Pull Requests to this repository if you have suggestions for improvement.
-
-This template is released into the public domain ([CC0](https://creativecommons.org/publicdomain/zero/1.0/)).
+Segment:
+* m float
+* n int
+* b float
+* f(t) = m*t^n +b
