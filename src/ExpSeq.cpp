@@ -2,6 +2,14 @@
 
 
 struct ExpSeq : Module {
+	static float MIN_LEVEL_VOLTAGE;
+	static float MAX_LEVEL_VOLTAGE;
+	static float MID_LEVEL_VOLTAGE;
+
+	static float MAX_VAL;
+	static float MIN_VAL;
+	static float MID_VAL;
+
 	enum ParamIds {
 		LEVEL1_PARAM,
 		LEVEL2_PARAM,
@@ -13,6 +21,11 @@ struct ExpSeq : Module {
 		POS4_PARAM,
 		LENGTH_PARAM,
 		TEMPO_PARAM,
+		PLAY_PARAM,
+		STEP_BACK_PARAM,
+		STEP_FORWARD_PARAM,
+		REWIND_PARAM,
+		RECORD_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -50,14 +63,22 @@ struct ExpSeq : Module {
 	// - onReset, onRandomize, onCreate, onDelete: implements special behavior when user clicks these from the context menu
 };
 
+float ExpSeq::MAX_LEVEL_VOLTAGE = 10.0;
+float ExpSeq::MIN_LEVEL_VOLTAGE = 0.0;
+float ExpSeq::MID_LEVEL_VOLTAGE = (ExpSeq::MAX_LEVEL_VOLTAGE - ExpSeq::MIN_LEVEL_VOLTAGE)/2;	
+
+float ExpSeq::MAX_VAL = 1.0;
+float ExpSeq::MIN_VAL = 0.0;
+float ExpSeq::MID_VAL = (ExpSeq::MAX_VAL - ExpSeq::MID_VAL)/2;	
+
 
 void ExpSeq::step() {
 }
 
 struct PlayButton : SVGSwitch, ToggleSwitch {
 	PlayButton() {
-		addFrame(SVG::load(assetGlobal("res/PlayButtonOn.svg")));
-		addFrame(SVG::load(assetGlobal("res/PlayButtonOff.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/PlayButtonOff.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/PlayButtonOn.svg")));
 	}
 };
 
@@ -70,10 +91,27 @@ struct ExpSeqWidget : ModuleWidget {
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(ParamWidget::create<PlayButton>(Vec(250, 37), module, ExpSeq::PITCH_PARAM, -3.0, 3.0, 0.0));
+		addParam(ParamWidget::create<PlayButton>(Vec(250-18, 234-21), module, ExpSeq::PLAY_PARAM, 0.0, 1.0, 0.0));
+		
+		ExpSeq::ParamIds levelParamIds[] = {ExpSeq::ParamIds::LEVEL1_PARAM, ExpSeq::ParamIds::LEVEL2_PARAM, ExpSeq::ParamIds::LEVEL3_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM, ExpSeq::ParamIds::LEVEL5_PARAM};
+		for(int i = 0; i < 5; i++)
+		{
+			int x = 80-11 + 22*i + 34*i-1;
+			int y = 125-11;
+			addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(x, y), module, levelParamIds[i], ExpSeq::MIN_LEVEL_VOLTAGE, ExpSeq::MAX_LEVEL_VOLTAGE, ExpSeq::MID_LEVEL_VOLTAGE));
+		}
+
+		ExpSeq::ParamIds posParamIds[] = {ExpSeq::ParamIds::POS2_PARAM, ExpSeq::ParamIds::POS3_PARAM,ExpSeq::ParamIds::POS4_PARAM};
+		for(int i = 0; i < 3; i++)
+		{
+			int x = 137-11 + 22*i + 34*i-1;
+			int y = 169-11;
+			addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(x, y), module, posParamIds[i], ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MID_VAL));
+		}
+
+		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(303-11, 169-11), module, ExpSeq::ParamIds::LENGTH_PARAM, ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MID_VAL));
 
 
-		//addParam(ParamWidget::create<Davies1900hBlackKnob>(Vec(28, 87), module, ExpSeq::PITCH_PARAM, -3.0, 3.0, 0.0));
 
 		//addInput(Port::create<PJ301MPort>(Vec(33, 186), Port::INPUT, module, ExpSeq::PITCH_INPUT));
 
