@@ -20,6 +20,7 @@ struct ExpSeq : Module {
 		POS3_PARAM,
 		POS4_PARAM,
 		LENGTH_PARAM,
+		ADD_PARAM,
 		TEMPO_PARAM,
 		PLAY_PARAM,
 		STEP_BACK_PARAM,
@@ -82,6 +83,37 @@ struct PlayButton : SVGSwitch, ToggleSwitch {
 	}
 };
 
+struct PlusButton : SVGSwitch, MomentarySwitch {
+	PlusButton() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/PlusButton.svg")));
+	}
+};
+
+struct ForwardButton : SVGSwitch, MomentarySwitch {
+	ForwardButton() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/ForwardButton.svg")));
+	}
+};
+
+struct BackButton : SVGSwitch, MomentarySwitch {
+	BackButton() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/BackButton.svg")));
+	}
+};
+
+struct RewindButton : SVGSwitch, MomentarySwitch {
+	RewindButton() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/RewindButton.svg")));
+	}
+};
+
+struct RecordButton : SVGSwitch, ToggleSwitch {
+	RecordButton() {
+		addFrame(SVG::load(assetPlugin(plugin, "res/RecordButtonOff.svg")));
+		addFrame(SVG::load(assetPlugin(plugin, "res/RecordButtonOn.svg")));
+	}
+};
+
 struct ExpSeqWidget : ModuleWidget {
 	ExpSeqWidget(ExpSeq *module) : ModuleWidget(module) {
 		setPanel(SVG::load(assetPlugin(plugin, "res/ExpSeq.svg")));
@@ -91,12 +123,12 @@ struct ExpSeqWidget : ModuleWidget {
 		addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addParam(ParamWidget::create<PlayButton>(Vec(250-18, 234-21), module, ExpSeq::PLAY_PARAM, 0.0, 1.0, 0.0));
+		addParam(ParamWidget::create<PlayButton>(Vec(250-18, 234-21), module, ExpSeq::PLAY_PARAM, ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MIN_VAL));
 		
 		ExpSeq::ParamIds levelParamIds[] = {ExpSeq::ParamIds::LEVEL1_PARAM, ExpSeq::ParamIds::LEVEL2_PARAM, ExpSeq::ParamIds::LEVEL3_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM, ExpSeq::ParamIds::LEVEL5_PARAM};
 		for(int i = 0; i < 5; i++)
 		{
-			int x = 80-11 + 22*i + 34*i-1;
+			int x = 80-11 + 22*i + 34*i;
 			int y = 125-11;
 			addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(x, y), module, levelParamIds[i], ExpSeq::MIN_LEVEL_VOLTAGE, ExpSeq::MAX_LEVEL_VOLTAGE, ExpSeq::MID_LEVEL_VOLTAGE));
 		}
@@ -104,20 +136,48 @@ struct ExpSeqWidget : ModuleWidget {
 		ExpSeq::ParamIds posParamIds[] = {ExpSeq::ParamIds::POS2_PARAM, ExpSeq::ParamIds::POS3_PARAM,ExpSeq::ParamIds::POS4_PARAM};
 		for(int i = 0; i < 3; i++)
 		{
-			int x = 137-11 + 22*i + 34*i-1;
+			int x = 137-11 + 22*i + 34*i;
 			int y = 169-11;
 			addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(x, y), module, posParamIds[i], ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MID_VAL));
 		}
 
 		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(303-11, 169-11), module, ExpSeq::ParamIds::LENGTH_PARAM, ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MID_VAL));
+		addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(353-11, 238-11), module, ExpSeq::ParamIds::TEMPO_PARAM, ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MID_VAL));
 
+		addParam(ParamWidget::create<PlusButton>(Vec(353-11, 169-11), module, ExpSeq::ParamIds::ADD_PARAM, ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MIN_VAL));
+		addParam(ParamWidget::create<ForwardButton>(Vec(303-11, 238-11), module, ExpSeq::ParamIds::STEP_FORWARD_PARAM, ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MIN_VAL));
+		addParam(ParamWidget::create<BackButton>(Vec(193-11, 238-11), module, ExpSeq::ParamIds::STEP_BACK_PARAM, ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MIN_VAL));
+		addParam(ParamWidget::create<RewindButton>(Vec(137-11, 238-11), module, ExpSeq::ParamIds::REWIND_PARAM, ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MIN_VAL));
+		addParam(ParamWidget::create<RecordButton>(Vec(77-11, 310-11), module, ExpSeq::ParamIds::RECORD_PARAM, ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MIN_VAL));
 
+		ExpSeq::OutputIds gateOutIds[] = {ExpSeq::OutputIds::GATE1_OUTPUT, ExpSeq::OutputIds::GATE2_OUTPUT, ExpSeq::OutputIds::GATE3_OUTPUT, ExpSeq::OutputIds::GATE4_OUTPUT};
+		for(int i = 0; i < 4; i++)
+		{
+			int x = 169-11 + 22*i + 23*i;
+			int y = 310-11;
+			addOutput(Port::create<PJ301MPort>(Vec(x, y), Port::OUTPUT, module, gateOutIds[i]));
+		}
 
-		//addInput(Port::create<PJ301MPort>(Vec(33, 186), Port::INPUT, module, ExpSeq::PITCH_INPUT));
+		ExpSeq::OutputIds cvOutIds[] = {ExpSeq::OutputIds::CV1_OUTPUT, ExpSeq::OutputIds::CV2_OUTPUT, ExpSeq::OutputIds::CV3_OUTPUT, ExpSeq::OutputIds::CV4_OUTPUT};
+		for(int i = 0; i < 4; i++)
+		{
+			int x = 169-11 + 22*i + 23*i;
+			int y = 355-11;
+			addOutput(Port::create<PJ301MPort>(Vec(x, y), Port::OUTPUT, module, cvOutIds[i]));
+		}
 
-		//addOutput(Port::create<PJ301MPort>(Vec(33, 275), Port::OUTPUT, module, ExpSeq::SINE_OUTPUT));
+		addOutput(Port::create<PJ301MPort>(Vec(353-11, 355-11), Port::OUTPUT, module, ExpSeq::OutputIds::CLOCK_OUTPUT));
 
-		//addChild(ModuleLightWidget::create<MediumLight<RedLight>>(Vec(41, 59), module, ExpSeq::BLINK_LIGHT));
+		ExpSeq::InputIds cvInIds[] = {ExpSeq::InputIds::RUN_INPUT, ExpSeq::InputIds::RESET_INPUT, ExpSeq::InputIds::CLOCK_INPUT, ExpSeq::InputIds::GATE_INPUT};
+		for(int i = 0; i < 4; i++)
+		{
+			int x = 31-11;
+			int y = 221-11  + 22*i + 22*i;
+			addInput(Port::create<PJ301MPort>(Vec(x, y), Port::INPUT, module, cvInIds[i]));
+		}
+
+		addInput(Port::create<PJ301MPort>(Vec(75-11, 221-11  + 22 + 22), Port::INPUT, module, ExpSeq::InputIds::RANDOM_INPUT));
+		addInput(Port::create<PJ301MPort>(Vec(75-11, 221-11  + 22*3 + 22*3), Port::INPUT, module, ExpSeq::InputIds::CV_INPUT));
 	}
 };
 
