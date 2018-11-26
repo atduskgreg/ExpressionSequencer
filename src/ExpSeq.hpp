@@ -57,7 +57,9 @@ struct ExpSeq : Module {
 	};
 
 	ExpSeq() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+    SchmittTrigger runTrigger;
     SchmittTrigger clockTrigger;
+    SchmittTrigger resetTrigger;
     double time = 0.0;
     Sequence sequence;
 	void step() override;

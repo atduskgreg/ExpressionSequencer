@@ -78,10 +78,33 @@ struct ExpSeqWidget : ModuleWidget {
 };
 
 void ExpSeq::step() {
-    double dTime = 1.0 / static_cast<double>(engineGetSampleRate());
-    time += dTime;
-    
-    outputs[CV1_OUTPUT].value = clamp(sequence.f(time), 0.0, 10.0);
+    float bpm=40.0 + 200.0 * params[TEMPO_PARAM].value;
+
+    if(resetTrigger.process(inputs[RESET_INPUT].value)) {
+        info("RESET!");
+        time = 0;
+    }
+
+    if(inputs[CLOCK_INPUT].active) {
+        clockTrigger.process(inputs[CLOCK_INPUT].value);
+    } else {
+        clockTrigger.process(0);
+    }
+
+    bool wasRunning = runTrigger.isHigh();
+    runTrigger.process(params[PLAY_PARAM].value + (inputs[RUN_INPUT].active ? inputs[RUN_INPUT].value : 0));
+    if(!wasRunning && runTrigger.isHigh()) {
+        info("ExpSeq starting run at %f BPM", bpm);
+    }
+    if(wasRunning && !runTrigger.isHigh()) {
+        info("ExpSeq stopping run at %f BPM", bpm);
+    }
+    if(runTrigger.isHigh()) {
+        double dTime = 1.0 / static_cast<double>(engineGetSampleRate());
+        time += dTime;
+        
+        outputs[CV1_OUTPUT].value = clamp(sequence.f(time), 0.0, 10.0);
+    }
 }
 
 // Specify the Module and ModuleWidget subclass, human-readable
