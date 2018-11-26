@@ -32,8 +32,9 @@ struct ExpSeqDisplay : TransparentWidget {
         for(int i = 0; i < numSegments; i++)
         {
             std::pair<float, float> pointData;
-            pointData.first = getVoltageY(i);
-            pointData.second = getVoltageX(i);
+            pointData.first = getVoltageX(i);
+            pointData.second = getVoltageY(i);
+            result.push_back(pointData);
         }
 
         return result;
