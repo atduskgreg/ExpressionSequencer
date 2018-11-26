@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 
 class Segment {
@@ -8,6 +9,7 @@ class Segment {
 public:
     float f(float t);
     Segment();
+    Segment(float startLevel, float endLevel, float exp);
 };
 
 class Envelope {
@@ -18,6 +20,7 @@ class Envelope {
 
 public:
     float f(float t);
+    int length();
     Envelope();
 };
 
@@ -26,5 +29,6 @@ class Sequence {
 
 public:
   float f(float t);
+  int length();
   Sequence();
 };
