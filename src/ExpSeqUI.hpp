@@ -1,5 +1,6 @@
 #import "ExpSeq.hpp"
 #import "kiwi/kiwi.h"
+#include <array>
 
 
 #define DECLARE_BUTTON(ButtonName, ButtonType) \
@@ -19,20 +20,57 @@ DECLARE_BUTTON(RewindButton, 	MomentarySwitch);
 
 struct ExpSeqDisplay : TransparentWidget {
 	ExpSeq *module;
+    static const int numSegments = 5;
+    std::array<float, numSegments> realPositions;
+    std::array<float, numSegments> constrainedPositions;
+
+    ExpSeqDisplay()
+    {
+        info("ExpSeqDisplay()");
+    }
+
+    void loadRealPositions()
+    {
+        int posStartingX[] = {69, 126, 183, 239, 295}; // TODO: store X-coords somewhere global
+		ExpSeq::ParamIds posParamIds[] = {ExpSeq::ParamIds::POS2_PARAM, ExpSeq::ParamIds::POS3_PARAM, ExpSeq::ParamIds::POS4_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM};
+
+        for(int i = 0; i < numSegments; i++)
+        {
+            realPositions[i] = box.pos.x + posStartingX[i];
+
+		    if(i >= 1 && i <= 3)
+		    {
+                float knobValue = module->params[posParamIds[i-1]].value;
+			    realPositions[i] += -200 + 400 * (knobValue - ExpSeq::MIN_VAL) / ExpSeq::MAX_VAL;
+		    }  
+        }
+    }
+
+    void constrainPositions()
+    {
+        constrainedPositions[0] = realPositions[0];
+        constrainedPositions[numSegments-1] = realPositions[numSegments-1];
+
+        for(int i = 1; i < numSegments-1; i++)
+        {
+            float prevVal = constrainedPositions[i-1];
+            constrainedPositions[i] = realPositions[i];
+
+            if(constrainedPositions[i] < prevVal)
+            {
+                constrainedPositions[i] = prevVal;
+            }
+            
+            if(constrainedPositions[i] > constrainedPositions[numSegments-1])
+            {
+                constrainedPositions[i] = constrainedPositions[numSegments-1];
+            }
+        }
+    }
 
 	float getSegmentX(int segmentNum)
 	{
-		int posStartingX[] = {69, 126, 183, 239, 295}; // TODO: store X-coords somewhere global
-
-		float result = box.pos.x + posStartingX[segmentNum];
-		if(segmentNum >= 1 && segmentNum <= 3)
-		{
-			ExpSeq::ParamIds posParamIds[] = {ExpSeq::ParamIds::POS2_PARAM, ExpSeq::ParamIds::POS3_PARAM, ExpSeq::ParamIds::POS4_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM};
-			float posValue = module->params[posParamIds[segmentNum-1]].value;
-			result += -100 + 200 * (posValue - ExpSeq::MIN_VAL) / ExpSeq::MAX_VAL;
-		}
-
-		return result;
+		return constrainedPositions[segmentNum];
 	}
 
 	float getSegmentY(int segmentNum)
@@ -72,6 +110,9 @@ struct ExpSeqDisplay : TransparentWidget {
 
 	void draw(NVGcontext *vg) override 
 	{
+        loadRealPositions();
+        constrainPositions();
+
 		// subtle gray border
 		nvgBeginPath(vg);
 		nvgRect(vg, box.pos.x,box.pos.y, box.size.x,box.size.y);
