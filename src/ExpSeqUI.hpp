@@ -1,6 +1,6 @@
 #import "ExpSeq.hpp"
+#import "Quantizer.hpp"
 #include <array>
-
 
 #define DECLARE_BUTTON(ButtonName, ButtonType) \
 struct ButtonName : SVGSwitch, ButtonType {\
@@ -23,9 +23,20 @@ struct ExpSeqDisplay : TransparentWidget {
     std::array<float, numSegments> realPositions;
     std::array<float, numSegments> constrainedPositions;
 
-    ExpSeqDisplay()
+    //Quantizer::Scale xQuantizerScale = Quantizer::Scale::BEATS_PER_NOTE;
+    //Quantizer::Scale yQuantizerScale = Quantizer::Scale::VOLT_PER_OCTAVE;
+
+    std::vector<std::pair<float, float>> getEnvelopeVoltages()
     {
-        info("ExpSeqDisplay()");
+        std::vector<std::pair<float, float>> result;
+        for(int i = 0; i < numSegments; i++)
+        {
+            std::pair<float, float> pointData;
+            pointData.first = getVoltageY(i);
+            pointData.second = getVoltageX(i);
+        }
+
+        return result;
     }
 
     void loadRealPositions()
@@ -67,17 +78,36 @@ struct ExpSeqDisplay : TransparentWidget {
         }
     }
 
+    float getVoltageX(int segmentNum)
+    {
+        float range = getSegmentX(numSegments - 1) - getSegmentX(0);
+        return getSegmentX(segmentNum) / range;
+    }
+
 	float getSegmentX(int segmentNum)
 	{
 		return constrainedPositions[segmentNum];
 	}
 
+    float getVoltageY(int segmentNum)
+    {
+		ExpSeq::ParamIds levelParamIds[] = {ExpSeq::ParamIds::LEVEL1_PARAM, ExpSeq::ParamIds::LEVEL2_PARAM, ExpSeq::ParamIds::LEVEL3_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM, ExpSeq::ParamIds::LEVEL5_PARAM};
+		return module->params[levelParamIds[segmentNum]].value;
+    }
+
 	float getSegmentY(int segmentNum)
 	{
-		ExpSeq::ParamIds levelParamIds[] = {ExpSeq::ParamIds::LEVEL1_PARAM, ExpSeq::ParamIds::LEVEL2_PARAM, ExpSeq::ParamIds::LEVEL3_PARAM, ExpSeq::ParamIds::LEVEL4_PARAM, ExpSeq::ParamIds::LEVEL5_PARAM};
-		float lvlValue = module->params[levelParamIds[segmentNum]].value;
-		return box.size.y - box.size.y * (lvlValue - ExpSeq::MIN_LEVEL_VOLTAGE) / ExpSeq::MAX_LEVEL_VOLTAGE;
+		return box.size.y - box.size.y * (getVoltageY(segmentNum) - ExpSeq::MIN_LEVEL_VOLTAGE) / ExpSeq::MAX_LEVEL_VOLTAGE;
 	}
+
+    void drawQuantizeGridY()
+    {
+       /* if(yQuantizerScale != Quantizer::Scale::VOLT_PER_OCTAVE)
+        {
+
+        }
+        */
+    }
 
 	void drawSegmentEdge(NVGcontext *vg, int segmentNum)
 	{
