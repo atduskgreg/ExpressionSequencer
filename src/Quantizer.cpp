@@ -7,6 +7,26 @@ Quantizer::Quantizer(std::vector<float> values)
     validValues = values;
 }
 
+void Quantizer::setScale(Scale inScale, float minVal, float maxVal, int numBeats)
+{
+    scale = inScale;
+
+    if(scale == Scale::VOLT_PER_OCTAVE)
+    {
+        validValues = Quantizer::VoltPerOctaveValues(minVal, maxVal);
+    }
+    
+    if(scale == Scale::BEATS_PER_NOTE)
+    {
+        validValues = Quantizer::BeatsPerNoteValues(minVal, maxVal, numBeats);
+    }
+
+    else if(scale == Scale::NONE)
+    {
+        validValues.clear();
+    }
+}
+
 float Quantizer::quantize(float value)
 {
     std::vector<float>::iterator lower = std::lower_bound(validValues.begin(), validValues.end(), value);
@@ -25,11 +45,14 @@ float Quantizer::quantize(float value)
 std::vector<float> Quantizer::VoltPerOctaveValues(float minVal, float maxVal)
 {
     std::vector<float> result;
+    float range = maxVal - minVal;
+    float numPixelsPerOctave = range / 12;
+
     float currVal = minVal;
     while(currVal < maxVal)
     {
         result.push_back(currVal);
-        currVal += 1.0/12;
+        currVal += numPixelsPerOctave;
     }
 
     return result;

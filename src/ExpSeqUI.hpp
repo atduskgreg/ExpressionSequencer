@@ -23,8 +23,31 @@ struct ExpSeqDisplay : TransparentWidget {
     std::array<float, numSegments> realPositions;
     std::array<float, numSegments> constrainedPositions;
 
-    //Quantizer::Scale xQuantizerScale = Quantizer::Scale::BEATS_PER_NOTE;
-    //Quantizer::Scale yQuantizerScale = Quantizer::Scale::VOLT_PER_OCTAVE;
+    Quantizer xQuantizer;
+    Quantizer yQuantizer;
+
+    void Init()
+    {
+        info("ExpSeqDisplay::Init()");
+        setQuantizerX(Quantizer::Scale::BEATS_PER_NOTE);
+        setQuantizerY(Quantizer::Scale::VOLT_PER_OCTAVE);
+    }
+
+    void setQuantizerY(Quantizer::Scale scale)
+    {
+        if(yQuantizer.getScale() != scale)
+        {
+            yQuantizer.setScale(scale, 0, box.size.y);
+        }
+    }
+    
+    void setQuantizerX(Quantizer::Scale scale)
+    {
+        if(xQuantizer.getScale() != scale)
+        {
+            xQuantizer.setScale(scale, 69, 295, 4); // TODO: Magic numbers! (this is hard-coded first and last stage x)
+        }
+    }
 
     std::vector<std::pair<float, float>> getEnvelopeVoltages()
     {
@@ -79,6 +102,7 @@ struct ExpSeqDisplay : TransparentWidget {
         }
     }
 
+
     float getVoltageX(int segmentNum)
     {
         float range = getSegmentX(numSegments - 1) - getSegmentX(0);
@@ -98,16 +122,34 @@ struct ExpSeqDisplay : TransparentWidget {
 
 	float getSegmentY(int segmentNum)
 	{
-		return box.size.y - box.size.y * (getVoltageY(segmentNum) - ExpSeq::MIN_LEVEL_VOLTAGE) / ExpSeq::MAX_LEVEL_VOLTAGE;
-	}
-
-    void drawQuantizeGridY()
-    {
-       /* if(yQuantizerScale != Quantizer::Scale::VOLT_PER_OCTAVE)
+		float val = box.size.y - box.size.y * (getVoltageY(segmentNum) - ExpSeq::MIN_LEVEL_VOLTAGE) / ExpSeq::MAX_LEVEL_VOLTAGE;
+    
+        if(yQuantizer.getScale() != Quantizer::Scale::NONE)
         {
-
+            return yQuantizer.quantize(val);
         }
-        */
+        else
+        {
+            return val;
+        }
+    }
+
+    void drawQuantizeGridY(NVGcontext *vg)
+    {
+        if(yQuantizer.getScale() != Quantizer::Scale::NONE)
+        {
+            std::vector<float> yVals = yQuantizer.getValidValues();
+            nvgBeginPath(vg);
+ 
+            for(auto y : yVals)
+            {
+                nvgMoveTo(vg, 55, box.pos.y +y);
+                nvgLineTo(vg, 315, box.pos.y + y);
+            }
+            nvgStrokeColor(vg, nvgRGBA(255,0,255,125));
+		    nvgStrokeWidth(vg, 1.0);
+	        nvgStroke(vg);
+        }
     }
 
 	void drawSegmentEdge(NVGcontext *vg, int segmentNum)
@@ -143,11 +185,8 @@ struct ExpSeqDisplay : TransparentWidget {
         loadRealPositions();
         constrainPositions();
 
-		// subtle gray border
-		nvgBeginPath(vg);
-		nvgRect(vg, box.pos.x,box.pos.y, box.size.x,box.size.y);
-		nvgStrokeColor(vg, nvgRGBA(165,165,165,255));
-		nvgStroke(vg);
+        drawQuantizeGridY(vg);
+
 		for(int i = 0; i < 5; i++){
 			if(i < 4)
 			{
@@ -155,5 +194,11 @@ struct ExpSeqDisplay : TransparentWidget {
 			}
 			drawSegmentEdge(vg, i);
 		}
+
+		// subtle gray border
+        nvgBeginPath(vg);
+		nvgRect(vg, box.pos.x,box.pos.y, box.size.x,box.size.y);
+		nvgStrokeColor(vg, nvgRGBA(165,165,165,255));
+		nvgStroke(vg);
 	}
 };

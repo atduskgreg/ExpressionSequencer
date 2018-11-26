@@ -72,6 +72,7 @@ struct ExpSeqWidget : ModuleWidget {
 			display->module = module;
 			display->box.pos = Vec(6, 7);
 			display->box.size = Vec(367, 95);
+			display->Init();
 			addChild(display);
 		}
 	}
