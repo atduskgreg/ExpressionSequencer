@@ -18,14 +18,18 @@ Segment::Segment(float startLevel, float endLevel, float exp) {
 }
 
 Envelope::Envelope() {
-    segments.push_back(new Segment(0, 1, 1));
-    segments.push_back(new Segment(1, 0.5, 0.5));
-    segments.push_back(new Segment(0.5, 0.5, 1));
-    segments.push_back(new Segment(0.5, 0, 2));
     onStep = 0;
     offStep = 1;
     isQuantized = false;
 }
+
+void Envelope::clearSegments() { segments.clear(); }
+
+void Envelope::addSegment(float startLevel, float endLevel, float exp, float startTime) {
+    segments.push_back(new Segment(startLevel, endLevel, exp));
+    segmentStarts.push_back(startTime);
+}
+
 float Envelope::f(float t) {
     int segmentCount = segments.size();
     int segmentIndex = (int)(t * segmentCount);
@@ -39,13 +43,18 @@ float Sequence::f(float t) {
     return envelopes.front()->f(fmod(t, this->length()));
 }
 
-struct lengthAccumulator {
-    int operator()(int oldvalue, Envelope *e) const {
-        return oldvalue + e->length();
-    }
-};
-
 int Sequence::length() {
+    struct lengthAccumulator {
+        int operator()(int oldvalue, Envelope *e) const {
+            return oldvalue + e->length();
+        }
+    };
     return std::accumulate(envelopes.begin(), envelopes.end(), 0,
                            lengthAccumulator());
+}
+
+void Sequence::clearEnvelopes() { envelopes.clear(); }
+
+void Sequence::addEnvelope(Envelope *envelope) {
+    envelopes.push_back(envelope);
 }

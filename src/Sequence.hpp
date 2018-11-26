@@ -6,29 +6,35 @@ class Segment {
     float b;
     float n;
 
-public:
+  public:
     float f(float t);
     Segment();
     Segment(float startLevel, float endLevel, float exp);
 };
 
 class Envelope {
-    int onStep;
-    int offStep;
     bool isQuantized;
     std::vector<Segment *> segments;
+    std::vector<float> segmentStarts;
 
-public:
+  public:
+    int onStep;
+    int offStep;
+
     float f(float t);
     int length();
+    void clearSegments();
+    void addSegment(float startLevel, float endLevel, float exp, float startTime);
     Envelope();
 };
 
 class Sequence {
-  std::vector<Envelope *> envelopes;
+    std::vector<Envelope *> envelopes;
 
-public:
-  float f(float t);
-  int length();
-  Sequence();
+  public:
+    float f(float t);
+    void clearEnvelopes();
+    void addEnvelope(Envelope *envelope);
+    int length();
+    Sequence();
 };

@@ -56,7 +56,16 @@ struct ExpSeq : Module {
 		NUM_LIGHTS
 	};
 
-	ExpSeq() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {}
+	ExpSeq() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+        Envelope *envelope = new Envelope();
+        envelope->addSegment(0, 1, 1, 0.0);
+        envelope->addSegment(1, 0.5, 0.5, 0.25);
+        envelope->addSegment(0.5, 0.5, 1, 0.5);
+        envelope->addSegment(0.5, 0, 2, 0.75);
+                
+        sequence.clearEnvelopes();
+        sequence.addEnvelope(envelope);
+    }
     SchmittTrigger runTrigger;
     SchmittTrigger clockTrigger;
     SchmittTrigger resetTrigger;
