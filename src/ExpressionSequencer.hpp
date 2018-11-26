@@ -3,7 +3,7 @@
 
 using namespace rack;
 
-// Forward-declare the Plugin, defined in Template.cpp
+// Forward-declare the Plugin, defined in ExpressionSequencer.cpp
 extern Plugin *plugin;
 
 // Forward-declare each Model, defined in each module source file
