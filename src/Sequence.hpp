@@ -18,6 +18,7 @@ class Envelope {
 
 public:
     float f(float t);
+    int length();
     Envelope();
 };
 
@@ -26,5 +27,6 @@ class Sequence {
 
 public:
   float f(float t);
+  int length();
   Sequence();
 };
