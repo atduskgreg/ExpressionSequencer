@@ -1,4 +1,5 @@
 #include "ExpSeqUI.hpp"
+#include <iostream>
 
 struct ExpSeqWidget : ModuleWidget {
     ExpSeqWidget(ExpSeq *module) : ModuleWidget(module) {
@@ -125,16 +126,17 @@ void ExpSeq::step() {
 
     auto it = voltages.begin();
     auto it2 = voltages.begin();
-    ++it2;
-    float startTime = 0;
-    for (; it2 != voltages.end(); ++it) {
+    it2++;
+    float startTime = 0.0;
+    while(it2 != voltages.end()) {
         float startLevel = (*it).second;
         float endLevel = (*it2).second;
         envelope->addSegment(startLevel, endLevel, 1, startTime);
-        printf("%f %f %f | ", startLevel, endLevel, startTime);
+        printf("%f %f %f ", startLevel, endLevel, startTime);
         startTime = (*it).first;
-        printf("( %f ) ", startTime);
-        ++it2;
+        printf("( %f )\n", startTime);
+        it++;
+        it2++;
     }
     printf("\n");
 

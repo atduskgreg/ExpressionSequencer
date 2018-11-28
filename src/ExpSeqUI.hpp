@@ -2,6 +2,7 @@
 #import "ExpSeq.hpp"
 #import "Quantizer.hpp"
 #include <array>
+#include <cassert>
 
 #define DECLARE_BUTTON(ButtonName, ButtonType) \
 struct ButtonName : SVGSwitch, ButtonType {\
@@ -107,7 +108,9 @@ struct ExpSeqDisplay : TransparentWidget {
     float getVoltageX(int segmentNum)
     {
         float range = getSegmentX(numSegments - 1) - getSegmentX(0);
-        return (getSegmentX(segmentNum) - getSegmentX(0)) / range;
+        float voltage = (getSegmentX(segmentNum) - getSegmentX(0)) / range;
+        assert(isfinite(voltage));
+        return voltage;
     }
 
 	float getSegmentX(int segmentNum)

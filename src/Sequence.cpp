@@ -31,10 +31,17 @@ void Envelope::addSegment(float startLevel, float endLevel, float exp, float sta
 }
 
 float Envelope::f(float t) {
-    int segmentCount = segments.size();
-    int segmentIndex = (int)(t * segmentCount);
+    std::vector<float>::iterator upper = std::upper_bound(segmentStarts.begin(), segmentStarts.end(), t);
+    float segmentStartTime = *upper;
+    float segmentEndTime = 1.0;
+    int segmentIndex = upper-segmentStarts.begin();
+    if(upper != segmentStarts.end()) {
+        ++upper;
+        segmentEndTime = *upper;
+    }
+    printf("Segment idx %d from %f to %f\n", segmentIndex, segmentStartTime, segmentEndTime);
     Segment *s = segments.at(segmentIndex);
-    return s->f(t * segmentCount - segmentIndex);
+    return s->f(t * 4 - segmentIndex);
 }
 int Envelope::length() { return offStep - onStep; }
 
