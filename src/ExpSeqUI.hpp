@@ -1,3 +1,4 @@
+#pragma once
 #import "ExpSeq.hpp"
 #import "Quantizer.hpp"
 #include <array>
@@ -106,7 +107,7 @@ struct ExpSeqDisplay : TransparentWidget {
     float getVoltageX(int segmentNum)
     {
         float range = getSegmentX(numSegments - 1) - getSegmentX(0);
-        return getSegmentX(segmentNum) / range;
+        return (getSegmentX(segmentNum) - getSegmentX(0)) / range;
     }
 
 	float getSegmentX(int segmentNum)
