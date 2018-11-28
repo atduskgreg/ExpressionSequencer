@@ -1,5 +1,7 @@
 #pragma once
 
+#include "dsp/digital.hpp"
+#include "Sequence.hpp"
 #include "ExpressionSequencer.hpp"
 #import "ExpSeqUI.hpp"
 

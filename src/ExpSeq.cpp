@@ -1,6 +1,4 @@
 #include "ExpSeqUI.hpp"
-#include "Sequence.hpp"
-#include "dsp/digital.hpp"
 
 struct ExpSeqWidget : ModuleWidget {
     ExpSeqWidget(ExpSeq *module) : ModuleWidget(module) {
@@ -128,7 +126,7 @@ void ExpSeq::step() {
     auto it = voltages.begin();
     auto it2 = voltages.begin();
     ++it2;
-    int startTime = 0;
+    float startTime = 0;
     for (; it2 != voltages.end(); ++it) {
         float startLevel = (*it).second;
         float endLevel = (*it2).second;
