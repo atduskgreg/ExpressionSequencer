@@ -1,6 +1,9 @@
 #pragma once
 
 #include "ExpressionSequencer.hpp"
+#import "ExpSeqUI.hpp"
+
+struct ExpSeqDisplay;
 
 struct ExpSeq : Module {
 	static float MIN_LEVEL_VOLTAGE;
@@ -69,6 +72,7 @@ struct ExpSeq : Module {
     SchmittTrigger runTrigger;
     SchmittTrigger clockTrigger;
     SchmittTrigger resetTrigger;
+    ExpSeqDisplay *display;
     double time = 0.0;
     Sequence sequence;
 	void step() override;
