@@ -137,13 +137,13 @@ void ExpSeq::step() {
         float startLevel = (*it).second;
         float endLevel = (*it2).second;
         envelope->addSegment(startLevel, endLevel, 1, startTime);
-        printf("%f %f %f ", startLevel, endLevel, startTime);
+        //printf("%f %f %f ", startLevel, endLevel, startTime);
         startTime = (*it).first;
-        printf("( %f )\n", startTime);
+        //printf("( %f )\n", startTime);
         it++;
         it2++;
     }
-    printf("\n");
+    //printf("\n");
 
     //sequence.clearEnvelopes();
     //sequence.addEnvelope(envelope);
