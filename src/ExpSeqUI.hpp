@@ -109,7 +109,7 @@ struct ExpSeqDisplay : TransparentWidget {
     {
         float range = getSegmentX(numSegments - 1) - getSegmentX(0);
         float voltage = (getSegmentX(segmentNum) - getSegmentX(0)) / range;
-        assert(isfinite(voltage));
+        // assert(isfinite(voltage));
         return voltage;
     }
 
