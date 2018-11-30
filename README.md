@@ -40,3 +40,11 @@
 ### Outputs
 
 * Do we want an end-of-sequence trigger? (we could do looping through patching that to the reset input)
+
+## To build
+
+```
+RACK_DIR=~/Documents/code/Rack make dist; cd ~/Documents/code/Rack; make run; cd plugins/ExpressionSequencer
+```
+
+(from the plugin directory (symlinked inside Rack's plugin dir))

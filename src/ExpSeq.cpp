@@ -119,9 +119,14 @@ struct ExpSeqWidget : ModuleWidget {
 };
 
 void ExpSeq::step() {
+    if(this->display == nullptr)
+    {
+        return;
+    }
     float bpm = 40.0 + 200.0 * params[TEMPO_PARAM].value;
 
     Envelope *envelope = new Envelope();
+    this->display->loadUserValues();
     auto voltages = this->display->getEnvelopeVoltages();
 
     auto it = voltages.begin();

@@ -65,6 +65,12 @@ struct ExpSeqDisplay : TransparentWidget {
         return result;
     }
 
+    void loadUserValues()
+    {
+        loadRealPositions();
+        constrainPositions();
+    }
+
     void loadRealPositions()
     {
         int posStartingX[] = {69, 126, 183, 239, 295}; // TODO: store X-coords somewhere global
@@ -186,8 +192,7 @@ struct ExpSeqDisplay : TransparentWidget {
 
 	void draw(NVGcontext *vg) override 
 	{
-        loadRealPositions();
-        constrainPositions();
+       //loadUserValues(); // this happens in step() if it doesn't it would need to happen here.
 
         drawQuantizeGridY(vg);
 
