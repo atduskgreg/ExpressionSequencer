@@ -145,8 +145,8 @@ void ExpSeq::step() {
     }
     printf("\n");
 
-    sequence.clearEnvelopes();
-    sequence.addEnvelope(envelope);
+    //sequence.clearEnvelopes();
+    //sequence.addEnvelope(envelope);
 
     if (resetTrigger.process(inputs[RESET_INPUT].value)) {
         info("RESET!");

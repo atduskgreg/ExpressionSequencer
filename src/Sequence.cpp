@@ -31,6 +31,7 @@ void Envelope::addSegment(float startLevel, float endLevel, float exp, float sta
 }
 
 float Envelope::f(float t) {
+    return 0;
     std::vector<float>::iterator upper = std::upper_bound(segmentStarts.begin(), segmentStarts.end(), t);
     float segmentStartTime = *upper;
     float segmentEndTime = 1.0;
