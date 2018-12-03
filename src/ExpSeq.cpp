@@ -191,6 +191,8 @@ void ExpSeq::step() {
         double dTime = 1.0 / static_cast<double>(engineGetSampleRate());
         time += dTime;
 
+        float envTimeOffset = std::fmod(time,1.0); // TODO: replace me with an accurate % offset in the current envelope (0.0-1.0)
+        this->display->setPlayhead(envTimeOffset);
         outputs[CV1_OUTPUT].value = clamp(sequence.f(time), 0.0, 10.0);
     }
 }

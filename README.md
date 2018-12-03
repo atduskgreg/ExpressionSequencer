@@ -21,7 +21,6 @@
 
 * Add toggle button for Y quantize
 * Label notes on Y-axis for quantize display
-* Add knob for X quantize (beats)
 * Fix quantize wrap-around bug
 * Draw x-quantize grid
 * Enforce x quantize

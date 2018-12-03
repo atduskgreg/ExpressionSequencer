@@ -33,6 +33,7 @@ DECLARE_POT(SmallPot, -0.75, 0.75);
 
 struct ExpSeqDisplay : TransparentWidget {
 	ExpSeq *module;
+    float playheadPos = 0.0f; // 0.0 - 1.0
     static const int numSegments = 5;
     std::array<float, numSegments> realPositions;
     std::array<float, numSegments> constrainedPositions;
@@ -45,6 +46,11 @@ struct ExpSeqDisplay : TransparentWidget {
         info("ExpSeqDisplay::Init()");
         setQuantizerX(Quantizer::Scale::BEATS_PER_NOTE);
         setQuantizerY(Quantizer::Scale::VOLT_PER_OCTAVE);
+    }
+
+    void setPlayhead(float p)
+    {
+        playheadPos = p;
     }
 
     void updateQuantizer(float xVal, float yVal)
@@ -178,6 +184,21 @@ struct ExpSeqDisplay : TransparentWidget {
         }
     }
 
+    void drawPlayhead(NVGcontext *vg)
+    {
+        float minX = getSegmentX(0);
+        float maxX = getSegmentX(numSegments - 1);
+
+        float playheadX = playheadPos * (maxX - minX) + minX;
+
+        nvgBeginPath(vg);
+        nvgMoveTo(vg, playheadX, box.pos.y);
+		nvgLineTo(vg, playheadX, box.pos.y + box.size.y);
+		nvgStrokeColor(vg, nvgRGBA(255,0,0,200));
+		nvgStrokeWidth(vg, 3.0);
+	    nvgStroke(vg);
+    }
+
     void drawQuantizeGridY(NVGcontext *vg)
     {
         if(yQuantizer.getScale() != Quantizer::Scale::NONE)
@@ -237,6 +258,8 @@ struct ExpSeqDisplay : TransparentWidget {
 			}
 			drawSegmentEdge(vg, i);
 		}
+
+        drawPlayhead(vg);
 
 		// subtle gray border
         nvgBeginPath(vg);
