@@ -12,12 +12,24 @@ struct ButtonName : SVGSwitch, ButtonType {\
     }\
 };
 
+#define DECLARE_POT(PotName, MinAngle, MaxAngle) \
+struct PotName : SVGKnob {\
+    PotName() {\
+		minAngle = MinAngle*M_PI;\
+		maxAngle = MaxAngle*M_PI;\
+		setSVG(SVG::load(assetPlugin(plugin, "res/"#PotName".svg")));\
+    }\
+};
+
 DECLARE_BUTTON(PlayButton, 	 	ToggleSwitch);
 DECLARE_BUTTON(RecordButton, 	ToggleSwitch);
 DECLARE_BUTTON(PlusButton,		MomentarySwitch);
 DECLARE_BUTTON(ForwardButton, 	MomentarySwitch);
 DECLARE_BUTTON(BackButton, 		MomentarySwitch);
 DECLARE_BUTTON(RewindButton, 	MomentarySwitch);
+DECLARE_BUTTON(UpButton,        MomentarySwitch);
+DECLARE_BUTTON(DownButton,      MomentarySwitch);
+DECLARE_POT(SmallPot, -0.75, 0.75);
 
 struct ExpSeqDisplay : TransparentWidget {
 	ExpSeq *module;

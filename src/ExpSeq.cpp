@@ -41,6 +41,13 @@ struct ExpSeqWidget : ModuleWidget {
                 ExpSeq::MAX_VAL, ExpSeq::MID_VAL));
         }
 
+        addParam(ParamWidget::create<UpButton>(
+            Vec(31 - 11, 125 - 11), module, ExpSeq::ParamIds::UP_SEQUENCE_PARAM,
+            ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MIN_VAL));
+        addParam(ParamWidget::create<DownButton>(
+            Vec(31 - 11, 169 - 11), module, ExpSeq::ParamIds::DOWN_SEQUENCE_PARAM,
+            ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MIN_VAL));
+
         addParam(ParamWidget::create<RoundSmallBlackKnob>(
             Vec(303 - 11, 169 - 11), module, ExpSeq::ParamIds::LENGTH_PARAM,
             ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MID_VAL));
@@ -48,8 +55,15 @@ struct ExpSeqWidget : ModuleWidget {
             Vec(353 - 11, 238 - 11), module, ExpSeq::ParamIds::TEMPO_PARAM,
             ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MID_VAL));
 
+        addParam(ParamWidget::create<SmallPot>(
+            Vec(340 - 11, 172 - 11), module, ExpSeq::ParamIds::X_QUANT_PARAM,
+            ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MID_VAL));
+        addParam(ParamWidget::create<SmallPot>(
+            Vec(372 - 11, 172 - 11), module, ExpSeq::ParamIds::Y_QUANT_PARAM,
+            ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MID_VAL));
+
         addParam(ParamWidget::create<PlusButton>(
-            Vec(353 - 11, 169 - 11), module, ExpSeq::ParamIds::ADD_PARAM,
+            Vec(353 - 11, 125 - 11), module, ExpSeq::ParamIds::ADD_PARAM,
             ExpSeq::MIN_VAL, ExpSeq::MAX_VAL, ExpSeq::MIN_VAL));
         addParam(ParamWidget::create<ForwardButton>(
             Vec(303 - 11, 238 - 11), module,
@@ -84,6 +98,10 @@ struct ExpSeqWidget : ModuleWidget {
             addOutput(Port::create<PJ301MPort>(Vec(x, y), Port::OUTPUT, module,
                                                cvOutIds[i]));
         }
+
+        addOutput(Port::create<PJ301MPort>(Vec(353 - 11, 310 - 11),
+                                           Port::OUTPUT, module,
+                                           ExpSeq::OutputIds::EOC_OUTPUT));
 
         addOutput(Port::create<PJ301MPort>(Vec(353 - 11, 355 - 11),
                                            Port::OUTPUT, module,

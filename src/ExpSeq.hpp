@@ -33,6 +33,10 @@ struct ExpSeq : Module {
 		STEP_FORWARD_PARAM,
 		REWIND_PARAM,
 		RECORD_PARAM,
+		UP_SEQUENCE_PARAM,
+		DOWN_SEQUENCE_PARAM,
+		X_QUANT_PARAM,
+		Y_QUANT_PARAM,
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -55,6 +59,7 @@ struct ExpSeq : Module {
 		GATE4_OUTPUT,
 		CV4_OUTPUT,
 		CLOCK_OUTPUT,
+		EOC_OUTPUT,
 		NUM_OUTPUTS
 	};
 	enum LightIds {
