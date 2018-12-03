@@ -47,6 +47,27 @@ struct ExpSeqDisplay : TransparentWidget {
         setQuantizerY(Quantizer::Scale::VOLT_PER_OCTAVE);
     }
 
+    void updateQuantizer(float xVal, float yVal)
+    {
+        if(xVal < 1e-4)
+        {
+            setQuantizerX(Quantizer::Scale::NONE);
+        }
+        else
+        {
+            setQuantizerX(Quantizer::Scale::BEATS_PER_NOTE);
+        }
+
+        if(yVal < 1e-4)
+        {
+            setQuantizerY(Quantizer::Scale::NONE);
+        }
+        else
+        {
+            setQuantizerY(Quantizer::Scale::VOLT_PER_OCTAVE);
+        }
+    }
+
     void setQuantizerY(Quantizer::Scale scale)
     {
         if(yQuantizer.getScale() != scale)
@@ -77,8 +98,9 @@ struct ExpSeqDisplay : TransparentWidget {
         return result;
     }
 
-    void loadUserValues()
+    void loadUserValues(std::vector<rack::Param> params)
     {
+        updateQuantizer(params[ExpSeq::ParamIds::X_QUANT_PARAM].value, params[ExpSeq::ParamIds::Y_QUANT_PARAM].value);
         loadRealPositions();
         constrainPositions();
     }
